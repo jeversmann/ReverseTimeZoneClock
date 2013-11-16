@@ -4,6 +4,7 @@ from pytz import timezone
 from datetime import datetime as time
 from random import choice
 import os.path
+import re
 
 app = Flask(__name__)
 
@@ -26,7 +27,7 @@ def hour_page(hour="4"):
         hour = request.args.getlist('hour')[0]
     ihour = int(hour)
     if(ihour > 11):
-        period = 'afternoon'
+        period = 'afternoon' if hour < 18 else 'evening'
         hour = (12 if ihour == 12 else ihour - 12)
     else:
         period = 'morning'
@@ -41,10 +42,11 @@ def menu_page():
     option_list = "\n".join([
         blank_option.format(hour, 
         str(12 if hour % 12 == 0 else hour % 12) + " o'clock in the "
-        + ("afternoon" if hour > 11 else "morning"))
+            + (("afternoon" if hour < 18 else "evening")
+            if hour > 11 else "morning"))
         for hour in range(24)])
     return render_template('menu.html',
         options=option_list)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')
