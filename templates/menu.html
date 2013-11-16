@@ -1,0 +1,12 @@
+<title>Where is when?</title>
+<center>
+    <h1>When do you want to go?</h1>
+    <form name="input" action="clock" method="get">
+        <select name="hour">
+{% autoescape false %}
+{{ options }}
+{% endautoescape %}
+        </select>
+        <input type="submit" value="Submit">
+    </form>
+</center>

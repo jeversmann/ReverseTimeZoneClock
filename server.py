@@ -1,10 +1,9 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, request, render_template, send_from_directory
 import pytz
 from pytz import timezone
 from datetime import datetime as time
 from random import choice
 import os.path
-import re
 
 app = Flask(__name__)
 
@@ -21,9 +20,10 @@ def get_place(hour):
         and len(re.findall("[0-9]",time_zone)) == 0)]
     return choice(places)
 
-@app.route('/<hour>')
+@app.route('/clock')
 def hour_page(hour="4"):
-    assert hour.isdigit()
+    if(len(request.args.getlist('hour')) > 0):
+        hour = request.args.getlist('hour')[0]
     ihour = int(hour)
     if(ihour > 11):
         period = 'afternoon'
@@ -37,7 +37,14 @@ def hour_page(hour="4"):
 
 @app.route('/')
 def menu_page():
-    return 'Menu'
+    blank_option = "\t\t<option value=\"{0}\">{1}</option>"
+    option_list = "\n".join([
+        blank_option.format(hour, 
+        str(12 if hour % 12 == 0 else hour % 12) + " o'clock in the "
+        + ("afternoon" if hour > 11 else "morning"))
+        for hour in range(24)])
+    return render_template('menu.html',
+        options=option_list)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
