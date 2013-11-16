@@ -12,18 +12,27 @@ app = Flask(__name__)
 def load_image(image=None):
     if(os.path.isfile('images/' + image)):
         return send_from_directory('images', image)
-    
 
-@app.route('/')
-def hello_world():
-    location = "It's four  o'clock in the morning in ";
-    four_places = [time_zone.split("/")[1].replace("_"," ")
+def get_place(hour):
+    places = [time_zone.split("/")[1].replace("_"," ")
         for time_zone in pytz.all_timezones
-        if(time.now(timezone(time_zone)).hour == 4
+        if(time.now(timezone(time_zone)).hour == hour
         and len(time_zone.split("/")) == 2
         and len(re.findall("[0-9]",time_zone)) == 0)]
-    print four_places
-    return render_template('four.html', loc=choice(four_places))
+    return choice(places)
+
+@app.route('/<hour>')
+def hello_world(hour="4"):
+    assert hour.isdigit()
+    ihour = int(hour)
+    if(ihour > 11):
+        return render_template('afternoon.html',
+            hour=(12 if ihour == 12 else ihour - 12), 
+            loc=get_place(ihour))
+    else:
+        return render_template('morning.html',
+            hour=(12 if ihour == 0 else ihour), 
+            loc=get_place(ihour))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
