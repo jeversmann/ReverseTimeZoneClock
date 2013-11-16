@@ -22,17 +22,22 @@ def get_place(hour):
     return choice(places)
 
 @app.route('/<hour>')
-def hello_world(hour="4"):
+def hour_page(hour="4"):
     assert hour.isdigit()
     ihour = int(hour)
     if(ihour > 11):
-        return render_template('afternoon.html',
-            hour=(12 if ihour == 12 else ihour - 12), 
-            loc=get_place(ihour))
+        period = 'afternoon'
+        hour = (12 if ihour == 12 else ihour - 12)
     else:
-        return render_template('morning.html',
-            hour=(12 if ihour == 0 else ihour), 
+        period = 'morning'
+        hour = (12 if ihour == 0 else ihour)
+    return render_template('hour.html',
+            hour=hour, period=period, 
             loc=get_place(ihour))
+
+@app.route('/')
+def menu_page():
+    return 'Menu'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
