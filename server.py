@@ -27,7 +27,7 @@ def hour_page(hour="4"):
         hour = request.args.getlist('hour')[0]
     ihour = int(hour)
     if(ihour > 11):
-        period = 'afternoon' if hour < 18 else 'evening'
+        period = 'afternoon' if ihour < 18 else 'evening'
         hour = (12 if ihour == 12 else ihour - 12)
     else:
         period = 'morning'
